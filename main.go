@@ -69,6 +69,13 @@ func appendList(path string) error {
 	if err != nil {
 		return err
 	}
+	stat, err := os.Stat(path)
+	if err != nil {
+		return err
+	}
+	if stat.IsDir() {
+		path = filepath.Clean(path) + string(filepath.Separator)
+	}
 	if _, err = os.Stat(path); err != nil {
 		return err
 	}
