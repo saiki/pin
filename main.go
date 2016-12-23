@@ -7,13 +7,21 @@ import "github.com/urfave/cli"
 import "os"
 import "path/filepath"
 
-const defaultStoreFile = "~/.pin"
+var out = "~/.pin"
 
 func main() {
 	app := cli.NewApp()
 	app.Name = "pin"
-	app.Usage = "pin directory."
+	app.Flags = []cli.Flag{
+		cli.StringFlag{
+			Name:  "file, f",
+			Value: out,
+			Usage: "in/out file.",
+		},
+	}
+	app.Version = "1.0.0"
 	app.Action = func(c *cli.Context) error {
+		out = c.String("file")
 		if !c.Args().Present() {
 			list()
 			return nil
@@ -52,7 +60,7 @@ func open(path string) (*os.File, error) {
 }
 
 func list() error {
-	file, err := open(defaultStoreFile)
+	file, err := open(out)
 	defer file.Close()
 	if err != nil {
 		return err
@@ -79,7 +87,7 @@ func appendList(path string) error {
 	if _, err = os.Stat(path); err != nil {
 		return err
 	}
-	file, err := open(defaultStoreFile)
+	file, err := open(out)
 	defer file.Close()
 
 	scanner := bufio.NewScanner(file)
