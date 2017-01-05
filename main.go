@@ -37,7 +37,6 @@ func (l list) list() []string {
 }
 
 func main() {
-	log.Print("main")
 	app := cli.NewApp()
 	app.Name = "pin"
 	app.Version = "1.0.0"
