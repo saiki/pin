@@ -21,19 +21,15 @@ func init() {
 	out = filepath.Join(u.HomeDir, ".pin")
 }
 
-type empty struct{}
-type list map[string]empty
+type list []string
 
-func (l list) add(s string) {
-	l[s] = empty{}
-}
-
-func (l list) list() []string {
-	keys := make([]string, 0, len(l))
-	for k := range l {
-		keys = append(keys, k)
+func (l list) add(s string) list {
+	for _, v := range l {
+		if v == s {
+			return l
+		}
 	}
-	return keys
+	return append(l, s)
 }
 
 func main() {
@@ -65,15 +61,14 @@ func add(path string) error {
 	if err != nil {
 		return nil
 	}
-	l.add(path)
+	l = l.add(path)
 	w, err := open(out)
 	defer w.Close()
 	if err != nil {
 		return err
 	}
-	o := l.list()
-	sort.Strings(o)
-	err = write(w, o)
+	sort.Strings(l)
+	err = write(w, l)
 	if err != nil {
 		return err
 	}
@@ -109,7 +104,7 @@ func show() error {
 	if err != nil {
 		return nil
 	}
-	for _, v := range l.list() {
+	for _, v := range l {
 		fmt.Println(v)
 	}
 	return nil
@@ -133,8 +128,8 @@ func format(path string) (string, error) {
 	return path, err
 }
 
-func read() (a list, err error) {
-	a = make(list)
+func read() (l list, err error) {
+	l = make(list, 0)
 	file, err := open(out)
 	defer file.Close()
 	if err != nil {
@@ -142,7 +137,7 @@ func read() (a list, err error) {
 	}
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
-		a.add(scanner.Text())
+		l = l.add(scanner.Text())
 	}
 	return
 }
