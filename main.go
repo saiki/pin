@@ -7,18 +7,17 @@ import "github.com/urfave/cli"
 import "io"
 import "log"
 import "os"
-import "os/user"
 import "path/filepath"
 import "sort"
 
 var out = "~/.pin"
 
 func init() {
-	u, err := user.Current()
+	dir, err := homedir.Dir()
 	if err != nil {
 		log.Panic(err)
 	}
-	out = filepath.Join(u.HomeDir, ".pin")
+	out = filepath.Join(dir, ".pin")
 }
 
 type list []string
